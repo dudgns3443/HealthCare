@@ -35,4 +35,4 @@ jobs:
           aws s3 cp \
             --recursive \
             --region ap-northeast-2 \
-            dist s3://프로젝트이름
+            /home/runner/work/HealthCare s3://프로젝트이름
