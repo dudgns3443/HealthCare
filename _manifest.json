@@ -7,7 +7,7 @@
 "name" : "AppKit",
 "scope" : "/",
 "display" : "fullscreen",
-"start_url" : "index.html",
+"start_url" : "login.html",
 "short_name" : "AppKit",
 "description" : "",
 "orientation" : "portrait",

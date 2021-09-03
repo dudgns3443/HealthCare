@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dudgns3443/HealthCare.git"
+    "url": "git+https://github.com/HyperLogicKorea/CaseUp-Frontend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dudgns3443/HealthCare/issues"
+    "url": "https://github.com/HyperLogicKorea/CaseUp-Frontend/issues"
   },
-  "homepage": "https://github.com/dudgns3443/HealthCare#readme",
+  "homepage": "https://github.com/HyperLogicKorea/CaseUp-Frontend.git#readme",
   "dependencies": {
     "express": "^4.17.1",
     "mongodb": "^4.1.1"

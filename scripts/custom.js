@@ -3,10 +3,11 @@ setTimeout(function(){
     var preloader = document.getElementById('preloader')
     if(preloader){preloader.classList.add('preloader-hide');}
 },150);
-
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
+    var url = 'http://localhost:8100/'
 
+    var loginID
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -20,6 +21,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Place all your custom Javascript functions and plugin calls below this line
     function init_template(){
+        var userId
+        var albumBucketName = "healthcare";
+        var bucketRegion = "ap-northeast-2";
+        var IdentityPoolId = 'ap-northeast-2:206bddfc-ae76-4a39-8ff7-0cb2ed79252f';
+
+        AWS.config.update({
+            region: bucketRegion,
+            credentials: new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: IdentityPoolId
+            })
+        });
+
+        var s3 = new AWS.S3({
+            apiVersion: "2006-03-01",
+            params: { Bucket: albumBucketName }
+        });
+        function createAlbum(albumName) {
+            albumName = albumName.trim();
+            if (!albumName) {
+              return alert("Album names must contain at least one non-space character.");
+            }
+            if (albumName.indexOf("/") !== -1) {
+              return alert("Album names cannot contain slashes.");
+            }
+            var albumKey = encodeURIComponent(albumName);
+            s3.headObject({ Key: albumKey }, function(err, data) {
+              if (!err) {
+                return alert("Album already exists.");
+              }
+              if (err.code !== "NotFound") {
+                return alert("There was an error creating your album: " + err.message);
+              }
+              s3.putObject({ Key: albumKey }, function(err, data) {
+                if (err) {
+                  return alert("There was an error creating your album: " + err.message);
+                }
+                alert("Successfully created album.");
+                viewAlbum(albumName);
+              });
+            });
+          }
+          function addPhoto(albumName) {
+            var files = document.querySelector('#file-upload').files;
+            if (!files.length) {
+              return alert("Please choose a file to upload first.");
+            }
+            var file = files[0];
+            var fileName = file.name;
+            var albumPhotosKey = encodeURIComponent(albumName) + "/";
+          
+            var photoKey = albumPhotosKey + fileName;
+          
+            // Use S3 ManagedUpload class as it supports multipart uploads
+            var upload = new AWS.S3.ManagedUpload({
+              params: {
+                Bucket: albumBucketName,
+                Key: photoKey,
+                Body: file
+              }
+            });
+          
+            var promise = upload.promise();
+          
+            promise.then(
+              function(data) {
+                alert("Successfully uploaded photo.");
+                viewAlbum(albumName);
+              },
+              function(err) {
+                return alert("There was an error uploading your photo: ", err.message);
+              }
+            );
+            return 'https://heathcare.s3.ap-northeast-2.amazonaws.com/'+albumName+'/'+fileName
+          }
         //Caching Global Variables
         var i, e, el; //https://www.w3schools.com/js/js_performance.asp
 
@@ -30,10 +105,111 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //Demo function for programtic creation of Menu
         //menu('menu-settings', 'show', 250);
+        //signup
+        var signupBtn = document.querySelector('#signinBtn')
+        if(signupBtn){
+            signupBtn.addEventListener('click',e =>{
+                var username = document.querySelector("#form1ab")
+                userId = username.value
+                createAlbum(userId)
+            })
+        }
+        //login
+        var LoginBtn = document.querySelector('#loginBtn')
+        if(LoginBtn){
+            LoginBtn.addEventListener("click", e => {
+                
+                // $.ajax({
+                //     type:'GET',
+                //     url: url+'signin',
+                //     data: {
+                //         name : '영훈',
+                //         password: '123'
+                //     },
+                //     success: (res)=>{
+                       
+                //     },
+                //     error: (log) =>{console.log('실패')}
+                // })
+                if(document.getElementById("loginId").value == '' || document.getElementById("loginPw").value == '') {
+                    e.preventDefault();
+                    alert('아이디, 비밀번호를 입력해주세요');
+                } else if (document.getElementById("loginId").value != 'test'){
+                    alert('아이디가 잘못되었습니다.');
+                }else if(document.getElementById("loginPw").value != 'test'){
+                    alert('비밀번호가 잘못되었습니다.');
+                } else{
+                    location.href='home.html';
+                }
 
+            })
+        }
+
+        var submitBtn = document.querySelector('#submitBtn')
+        if(submitBtn){
+            var title = document.querySelector('#form4')
+            var decision = document.querySelector('#form5')
+            var date = document.querySelector('#form6')
+            var context = document.querySelector('#form7')
+            var imgUrl
+            submitBtn.addEventListener("click", e =>{
+                
+                if(title.value == '' || decision.value == 'default' || date.value == '' || context.value == ''){
+                    imgUrl = addPhoto('testAlbum');
+                    console.log(imgUrl)
+                    e.preventDefault();   
+                } else{
+                    imgUrl = addPhoto(userId);
+                    $.ajax({
+                        type:'GET',
+                        url: url+'data',
+                        data: {
+                            title : title.value,
+                            decision: decision.value,
+                            date : date.value,
+                            context : context.value,
+                            imgUrl : imgUrl
+                        },
+                        success: (res)=>{
+                            title.value = null
+                            decision.value = null
+                            date.value = null
+                            context. value = null
+                        },
+                        error: (log) =>{console.log('error')}
+                    })
+                    window.location.reload()
+                }
+            })
+        }
+
+        var home = document.querySelector('#home')
+        if(home){
+                $.ajax({
+                    type:'GET',
+                    url: url+'getPosts',
+                    success: (res)=>{
+                        res.reverse().forEach(ele =>{
+                            home.innerHTML += '<div class="card card-style" data-card-height="450" style="background-image: url('+ ele.imgUrl +');">'
+                            + '<div class="card-bottom">'
+                            + '   <div class="content text-end">'
+                            + '      <h1 class="color-white font-28">'+ ele.title +'</h1>'
+                            +        '<p class="color-white opacity-70">'
+                            +        ele.decision 
+                            +       ' </p>'
+                            +    '</div>'
+                            +'</div>'
+                            +'<div class="card-overlay bg-gradient opacity-80"></div>'
+                            +'<div class="divider divider-margins"></div>'
+                            +' </div>'
+                        })
+                    },
+                    error: (log) =>{console.log('error')}
+                })
+        }
         //Activating Menus
         document.querySelectorAll('.menu').forEach(el=>{el.style.display='block'})
-
+        
         //Validator
         var inputField = document.querySelectorAll('input');
         if(inputField.length){
@@ -61,22 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             var regularField = document.querySelectorAll('.input-style input:not([type="date"])')
             regularField.forEach(el => el.addEventListener('keyup', e => {
-                if(!el.value == ""){
-                    el.parentElement.classList.add('input-style-active');
-                    el.parentElement.querySelector('em').classList.add('disabled');
-                } else {
-                    el.parentElement.querySelectorAll('.valid')[0].classList.add('disabled');
-                    el.parentElement.querySelectorAll('.invalid')[0].classList.add('disabled');
-                    el.parentElement.classList.remove('input-style-active');
-                    el.parentElement.querySelector('em').classList.remove('disabled');
-                }
+                // if(!el.value == ""){
+                //     el.parentElement.classList.add('input-style-active');
+                //     el.parentElement.querySelector('em').classList.add('disabled');
+                // } else {
+                //     el.parentElement.querySelectorAll('.valid')[0].classList.add('disabled');
+                //     el.parentElement.querySelectorAll('.invalid')[0].classList.add('disabled');
+                //     el.parentElement.classList.remove('input-style-active');
+                //     el.parentElement.querySelector('em').classList.remove('disabled');
+                // }
             }));
 
             var regularTextarea = document.querySelectorAll('.input-style textarea')
             regularTextarea.forEach(el => el.addEventListener('keyup', e => {
                 if(!el.value == ""){
-                    el.parentElement.classList.add('input-style-active');
-                    el.parentElement.querySelector('em').classList.add('disabled');
+                    // el.parentElement.classList.add('input-style-active');
+                    // el.parentElement.querySelector('em').classList.add('disabled');
                 } else {
                     el.parentElement.classList.remove('input-style-active');
                     el.parentElement.querySelector('em').classList.remove('disabled');
@@ -86,9 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
             var selectField = document.querySelectorAll('.input-style select')
             selectField.forEach(el => el.addEventListener('change', e => {
                 if(el.value !== "default"){
-                    el.parentElement.classList.add('input-style-active');
-                    el.parentElement.querySelectorAll('.valid')[0].classList.remove('disabled');
-                    el.parentElement.querySelectorAll('.invalid, em, span')[0].classList.add('disabled');
+                    // el.parentElement.classList.add('input-style-active');
+                    // el.parentElement.querySelectorAll('.valid')[0].classList.remove('disabled');
+                    // el.parentElement.querySelectorAll('.invalid, em, span')[0].classList.add('disabled');
                 }
                 if(el.value == "default"){
                     el.parentElement.querySelectorAll('span, .valid, em')[0].classList.add('disabled');
@@ -99,9 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             var dateField = document.querySelectorAll('.input-style input[type="date"]')
             dateField.forEach(el => el.addEventListener('change', e => {
-                el.parentElement.classList.add('input-style-active');
-                el.parentElement.querySelectorAll('.valid')[0].classList.remove('disabled');
-                el.parentElement.querySelectorAll('.invalid')[0].classList.add('disabled');
+                // el.parentElement.classList.add('input-style-active');
+                // el.parentElement.querySelectorAll('.valid')[0].classList.remove('disabled');
+                // el.parentElement.querySelectorAll('.invalid')[0].classList.add('disabled');
             }));
 
             var validateField = document.querySelectorAll('.validate-field input, .validator-field textarea');
@@ -120,19 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(el.value === ""){unfilled(el);}
                 }));
             }
-        }
-
-        //Login
-        var LoginBtn = document.querySelector('#loginBtn')
-        if(LoginBtn){
-            LoginBtn.addEventListener("click", e => {
-                if(document.getElementById("loginId").value == '' || document.getElementById("loginPw").value == '') {
-                    e.preventDefault();
-                    alert('아이디, 비밀번호를 입력해주세요');
-                } else {
-                    location.href='_starter_simple.html';
-                }
-            })
         }
 
         //Image Sliders
@@ -539,6 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   if (this.files && this.files[0]) {
                   var img = document.getElementById('image-data');
                   img.src = URL.createObjectURL(this.files[0]);
+                  console.log(URL.createObjectURL(this.files[0]))
               }
                 const files = event.target.files;
                 const fileName = files[0].name;
