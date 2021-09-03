@@ -9,7 +9,7 @@ const url = `mongodb+srv://hyperlogic:6408@healthcare.s6oc1.mongodb.net/myFirstD
 app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1');
+  res.setHeader('Access-Control-Allow-Origin', 'http://3.34.133.128');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
