@@ -5,9 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = 'http://3.34.133.128:8100/'
-
-    var loginID
+    var url = 'http://localhost:8100/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -21,8 +19,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Place all your custom Javascript functions and plugin calls below this line
     function init_template(){
-        var userId
-        var albumBucketName = "healthcare";
+        function setCookie(c_name,value,exdays)
+        {
+            var exdate=new Date();
+            exdate.setDate(exdate.getDate() + exdays);
+            var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+            document.cookie=c_name + "=" + c_value;
+        }
+        function getCookie(c_name)
+        {
+            var i,x,y,ARRcookies=document.cookie.split(";");
+            for (i=0;i<ARRcookies.length;i++)
+            {
+                x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+                y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+                x=x.replace(/^\s+|\s+$/g,"");
+                if (x==c_name)
+                {
+                return unescape(y);
+                }
+            }
+        }
+        var userId = getCookie('userId')
+        var albumBucketName = "heathcare";
         var bucketRegion = "ap-northeast-2";
         var IdentityPoolId = 'ap-northeast-2:206bddfc-ae76-4a39-8ff7-0cb2ed79252f';
 
@@ -32,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 IdentityPoolId: IdentityPoolId
             })
         });
-
+        //S3 SDK
         var s3 = new AWS.S3({
             apiVersion: "2006-03-01",
             params: { Bucket: albumBucketName }
@@ -42,10 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!albumName) {
               return alert("Album names must contain at least one non-space character.");
             }
-            if (albumName.indexOf("/") !== -1) {
-              return alert("Album names cannot contain slashes.");
-            }
-            var albumKey = encodeURIComponent(albumName);
+            // if (albumName.indexOf("/") !== -1) {
+            //   return alert("Album names cannot contain slashes.");
+            // }
+            var albumKey = encodeURIComponent(albumName) +'/';
             s3.headObject({ Key: albumKey }, function(err, data) {
               if (!err) {
                 return alert("Album already exists.");
@@ -57,12 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (err) {
                   return alert("There was an error creating your album: " + err.message);
                 }
-                alert("Successfully created album.");
-                viewAlbum(albumName);
+                location.href='home.html'
               });
             });
-          }
-          function addPhoto(albumName) {
+        }
+        function addPhoto(albumName) {
             var files = document.querySelector('#file-upload').files;
             if (!files.length) {
               return alert("Please choose a file to upload first.");
@@ -80,21 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 Key: photoKey,
                 Body: file
               }
-            });
-          
+            })
             var promise = upload.promise();
           
             promise.then(
               function(data) {
-                alert("Successfully uploaded photo.");
-                viewAlbum(albumName);
+                window.location.reload()
               },
               function(err) {
                 return alert("There was an error uploading your photo: ", err.message);
               }
             );
             return 'https://heathcare.s3.ap-northeast-2.amazonaws.com/'+albumName+'/'+fileName
-          }
+        }
         //Caching Global Variables
         var i, e, el; //https://www.w3schools.com/js/js_performance.asp
 
@@ -105,46 +121,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //Demo function for programtic creation of Menu
         //menu('menu-settings', 'show', 250);
+
         //signup
-        var signupBtn = document.querySelector('#signinBtn')
+        var signupBtn = document.querySelector('#signupBtn')
         if(signupBtn){
             signupBtn.addEventListener('click',e =>{
-                var username = document.querySelector("#form1ab")
-                userId = username.value
-                createAlbum(userId)
+                var signId = document.querySelector("#form1ab")
+                var userEmail = document.querySelector('#form1ac')
+                var pw = document.querySelector('#form1ad')
+                var confirmPw = document.querySelector('#form1ae')
+                var check = false
+                if (pw.value != confirmPw.value){
+                    alert('같은 비밀번호를 입력하세요.') 
+                }else if(signId.value == '' || userEmail.value == '' || pw.value == '' || confirmPw.value ==''){
+                    alert('입력하지 않은 항목이 있습니다.');
+                } else{
+                    console.log(signId.value, pw.value)
+                    $.ajax({
+                        type:'GET',
+                        url: url+'signUp',
+                        async : false,
+                        data: {
+                            userId : signId.value,
+                            email : userEmail.value,
+                            password : pw.value
+                        },
+                        success: (res)=>{
+                            if(res ==true){
+                                setCookie('userId',signId.value,1)
+                                createAlbum(signId.value)
+                            } else {
+                                alert(res)
+                                
+                            }
+                        },
+                        error: (log) =>{alert('오류 발생')}
+                    })
+                    // if(check)
+                    //     location.href='home.html'
+                }
             })
         }
         //login
         var LoginBtn = document.querySelector('#loginBtn')
         if(LoginBtn){
             LoginBtn.addEventListener("click", e => {
-                
-                // $.ajax({
-                //     type:'GET',
-                //     url: url+'signin',
-                //     data: {
-                //         name : '영훈',
-                //         password: '123'
-                //     },
-                //     success: (res)=>{
-                       
-                //     },
-                //     error: (log) =>{console.log('실패')}
-                // })
-                if(document.getElementById("loginId").value == '' || document.getElementById("loginPw").value == '') {
-                    e.preventDefault();
-                    alert('아이디, 비밀번호를 입력해주세요');
-                } else if (document.getElementById("loginId").value != 'test'){
-                    alert('아이디가 잘못되었습니다.');
-                }else if(document.getElementById("loginPw").value != 'test'){
-                    alert('비밀번호가 잘못되었습니다.');
+                e.preventDefault();
+                if (document.getElementById("loginId").value == ''){
+                    alert('아이디를 입력해주세요');
+                }else if(document.getElementById("loginPw").value == ''){
+                    alert('비밀번호를 입력해주세요');
                 } else{
-                    location.href='home.html';
+                
+                    $.ajax({
+                        type:'GET',
+                        async : false,
+                        url: url+'signIn',
+                        data: {
+                            userId : document.getElementById("loginId").value,
+                            password : document.getElementById("loginPw").value
+                        },
+                        success: (res)=>{
+                            if(res){
+                                setCookie('userId',document.getElementById("loginId").value,1)
+                                location.href='home.html';
+                            }
+                            else 
+                                alert('아이디 또는 패스워드가 일치하지 않습니다.')
+                        },
+                        error: (log) =>{alert('로그인 실패')}
+                    })
+
                 }
 
             })
         }
-
+        //UPLOAD
         var submitBtn = document.querySelector('#submitBtn')
         if(submitBtn){
             var title = document.querySelector('#form4')
@@ -155,8 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.addEventListener("click", e =>{
                 
                 if(title.value == '' || decision.value == 'default' || date.value == '' || context.value == ''){
-                    imgUrl = addPhoto('testAlbum');
-                    console.log(imgUrl)
                     e.preventDefault();   
                 } else{
                     imgUrl = addPhoto(userId);
@@ -164,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         type:'GET',
                         url: url+'data',
                         data: {
+                            userId : userId,
                             title : title.value,
                             decision: decision.value,
                             date : date.value,
@@ -178,35 +229,41 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         error: (log) =>{console.log('error')}
                     })
-                    window.location.reload()
                 }
             })
         }
-
+        //HOME
         var home = document.querySelector('#home')
         if(home){
-                $.ajax({
-                    type:'GET',
-                    url: url+'getPosts',
-                    success: (res)=>{
-                        res.reverse().forEach(ele =>{
-                            home.innerHTML += '<div class="card card-style" data-card-height="450" style="background-image: url('+ ele.imgUrl +');">'
-                            + '<div class="card-bottom">'
-                            + '   <div class="content text-end">'
-                            + '      <h1 class="color-white font-28">'+ ele.title +'</h1>'
-                            +        '<p class="color-white opacity-70">'
-                            +        ele.decision 
-                            +       ' </p>'
-                            +    '</div>'
-                            +'</div>'
-                            +'<div class="card-overlay bg-gradient opacity-80"></div>'
-                            +'<div class="divider divider-margins"></div>'
-                            +' </div>'
-                        })
-                    },
-                    error: (log) =>{console.log('error')}
+ 
+            $.ajax({
+                type:'GET',
+                url: url+'getPosts',
+                success: (res)=>{
+                    res.reverse().forEach(ele =>{
+                        home.innerHTML += '<div class="card card-style post" data-card-height="450" style="background-image: url('+ ele.imgUrl +');">'
+                        + '<div class="card-bottom">'
+                        + '   <div class="content text-end">'
+                        + '      <h1 class="color-white font-28">'+ ele.title +'</h1>'
+                        +        '<p class="color-white opacity-70">'
+                        +        ele.decision 
+                        +       ' </p>'
+                        +    '</div>'
+                        +'</div>'
+                        +'<div class="card-overlay bg-gradient opacity-80"></div>'
+                        +'<div class="divider divider-margins"></div>'
+                        +' </div>'
+                    })
+                },
+                error: (log) =>{console.log('error')}
+            })
+            document.querySelectorAll('.post').forEach(ele => {
+                ele.addEventListener('click',e =>{
+
                 })
+            })    
         }
+        
         //Activating Menus
         document.querySelectorAll('.menu').forEach(el=>{el.style.display='block'})
         
@@ -1156,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(searchField.length){
             var searchResults = document.querySelectorAll('.search-results')
             var searchNoResults = document.querySelectorAll('.search-no-results');
-            var searchTotal = document.querySelectorAll(".search-results div")[0].childElementCount;
+            var searchTotal = document.querySelectorAll(".search-results div")
             var searchTrending = document.querySelectorAll('.search-trending');
             function searchFunction(){
                 var searchStr = searchField[0].value;
