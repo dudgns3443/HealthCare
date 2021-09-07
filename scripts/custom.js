@@ -5,7 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = 'http://localhost:8100/'
+    var url = 'http://3.34.133.128:8100/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
