@@ -38,7 +38,7 @@ MongoClient.connect(url,(e,client)=>{
 
   app.get('/getPosts',(req,res)=>{
     const db = client.db('caseup')
-    db.collection('posts').find({status : 'public'}).toArray((err,docs) =>{
+    db.collection('posts').find({}).toArray((err,docs) =>{
       res.send(docs)
     })
   })
