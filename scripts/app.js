@@ -9,7 +9,7 @@ const url = `mongodb+srv://hyperlogic:6408@healthcare.s6oc1.mongodb.net/myFirstD
 app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://3.34.133.128');
+  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -38,8 +38,7 @@ MongoClient.connect(url,(e,client)=>{
 
   app.get('/getPosts',(req,res)=>{
     const db = client.db('caseup')
-    var result
-    db.collection('posts').find({}).toArray((err,docs) =>{
+    db.collection('posts').find({status : 'public'}).toArray((err,docs) =>{
       res.send(docs)
     })
   })
@@ -54,7 +53,7 @@ MongoClient.connect(url,(e,client)=>{
       }
       else{
         db.collection('userInfo').insertOne(req.query)
-        res.cookie('userId',req.query.userId,{maxAge:3000})
+        // res.cookie('userId',req.query.userId,{maxAge:3000})
         res.send(true)
       }
     })
@@ -67,7 +66,7 @@ MongoClient.connect(url,(e,client)=>{
       if(docs.length == 0)
         res.send(false)
       else
-        res.send(true)
+        res.send(docs)
     })
   })
 

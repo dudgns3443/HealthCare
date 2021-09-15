@@ -22,7 +22,7 @@
 <div id="page">
     
     <div class="header header-fixed header-logo-center header-auto-show">
-        <a href="index.html" class="header-title">News Feed</a>
+        <a href="index.html" class="header-title">Home</a>
         <a href="#" data-back-button class="header-icon header-icon-1"><i class="fas fa-chevron-left"></i></a>
         <a href="#" data-menu="menu-main" class="header-icon header-icon-4"><i class="fas fa-bars"></i></a>
         <a href="#" data-toggle-theme class="header-icon header-icon-3 show-on-theme-dark"><i class="fas fa-sun"></i></a>
@@ -38,7 +38,7 @@
     </div>
     
     <div class="page-title page-title-fixed">
-        <h1>News Feed</h1>
+        <h1>Home</h1>
         <a href="#" class="page-title-icon shadow-xl bg-theme color-theme" data-menu="menu-share"><i class="fa fa-share-alt"></i></a>
         <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-light" data-toggle-theme><i class="fa fa-moon"></i></a>
         <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-dark" data-toggle-theme><i class="fa fa-lightbulb color-yellow-dark"></i></a>
@@ -46,8 +46,18 @@
     </div>
     <div class="page-title-clear"></div>
         
-    <div class="page-content" id='home'>
-                
+    <div class="page-content " >
+        <div  class="card card-style"> 
+            <div class="d-flex content mb-2">
+                <div class="flex-grow-1">
+                    <h2>News Feeds</h2>
+                </div>
+            </div>
+            <div class="content mb-2">
+   
+                <div id='home' class="gallery-views gallery-view-3 mt-n4"></div>
+            </div>
+        </div>
     </div>
     <!-- Page content ends here-->
     
@@ -55,12 +65,41 @@
     class="menu menu-box-modal rounded-0" 
          data-menu-height="cover"
          data-menu-width="cover">
+
          <div class="card-top pt-4 ps-3 pe-3">
             <a href="#" class="close-menu icon icon-s rounded-l bg-theme "><i class="fa fa-times color-red-dark"></i></a>
         </div>
         <div class="card card-style" style="margin-top:100px">
-    
-            <div class="content" >        
+            
+            <div class="content" > 
+               <div class="content">
+                <div class ='row'> 
+                    <div class="form-check icon-check ">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" value="Public" id="radio1">
+                        <label class="form-check-label" for="radio1">Public</label>
+                        <i class="icon-check-1 fa fa-circle color-gray-dark font-16"></i>
+                        <i class="icon-check-2 fa fa-check-circle font-16 color-highlight"></i>
+                    </div>
+                    <div class="form-check icon-check ">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" value="Private" id="radio2">
+                        <label class="form-check-label" for="radio2">Private</label>
+                        <i class="icon-check-1 fa fa-circle color-gray-dark font-16"></i>
+                        <i class="icon-check-2 fa fa-check-circle font-16 color-highlight"></i>
+                    </div>
+                    <div class="form-check icon-check">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" value="Writing" id="radio3">
+                        <label class="form-check-label" for="radio3">Writing</label>
+                        <i class="icon-check-1 fa fa-circle color-gray-dark font-16"></i>
+                        <i class="icon-check-2 fa fa-check-circle font-16 color-highlight"></i>
+                    </div>
+                    <div class="form-check icon-check ">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" value="Archive" id="radio4">
+                        <label class="form-check-label" for="radio4">Archive</label>
+                        <i class="icon-check-1 fa fa-circle color-gray-dark font-16"></i>
+                        <i class="icon-check-2 fa fa-check-circle font-16 color-highlight"></i>
+                    </div>      
+                </div>
+               </div>
                 <h3>Write Case</h3>
                 <p>
                     These boxes will react to them when you type or select a value.
@@ -77,10 +116,6 @@
                     <select id="form5">
                         <option value="default" disabled selected>진단명</option>
                         <option value="미상">미상</option>
-                        <option value="Linux">Linux</option>
-                        <option value="MacOS">MacOS</option>
-                        <option value="Android">Android</option>
-                        <option value="Windows">Windows</option>
                     </select>
                     <span><i class="fa fa-chevron-down"></i></span>
 
@@ -104,41 +139,71 @@
         <div class="card card-style">
             <div class="content" >
             
-                <div class="content mb-0">
-                    <div class="file-data pb-5">
-                        <input type="file" id="file-upload" class="upload-file bg-highlight shadow-s rounded-s " accept="image/*">
-                        <p class="upload-file-text color-white">Upload Image</p>
+                <div class="content mb-0 row">
+                    <div class="file-data pb-5 col-4 text-center">
+                        <input type="file" style="height: 110px;" name="file-upload" class="upload-file bg-highlight shadow-s rounded-s " accept="image/*">
+                        <p class="upload-file-text color-white">upload</p>
                     </div>
                     <div class="list-group list-custom-large upload-file-data disabled">
                         <img id="image-data" src="images/empty.png" class="img-fluid">
-                        <a href="#" class="border-0">
-                            <i class="fa font-14 fa-info-circle color-blue-dark"></i>
-                            <span>File Name</span>
-                            <strong class="upload-file-name">JS Populated</strong>
-                        </a>        
-                        <a href="#" class="border-0">
-                            <i class="fa font-14 fa-weight-hanging color-brown-dark"></i>
-                            <span>File Size</span>
-                            <strong class="upload-file-size">JS Populated</strong>
-                        </a>        
-                        <a href="#" class="border-0">
-                            <i class="fa font-14 fa-tag color-red-dark"></i>
-                            <span>File Type</span>
-                            <strong class="upload-file-type">JS Populated</strong>
-                        </a>        
-                        <a href="#" class="border-0 pb-4">
-                            <i class="fa font-14 fa-clock color-blue-dark"></i>
-                            <span>Modified Date</span>
-                            <strong class="upload-file-modified">JS Populated</strong>
-                        </a>        
                     </div>
+                    <div class="file-data pb-5 col-4">
+                        <input type="file" style="height: 110px;" name="file-upload" class="upload-file bg-highlight shadow-s rounded-s " accept="image/*">
+                        <p class="upload-file-text color-white">upload</p>
+                    </div>
+                    <div class="list-group list-custom-large upload-file-data disabled">
+                        <img id="image-data" src="images/empty.png" class="img-fluid">
+                    </div>
+                    <div class="file-data pb-5 col-4">
+                        <input type="file" style="height: 110px;" name="file-upload" class="upload-file bg-highlight shadow-s rounded-s " accept="image/*">
+                        <p class="upload-file-text color-white">upload</p>
+                    </div>
+                    <div class="list-group list-custom-large upload-file-data disabled">
+                        <img id="image-data" src="images/empty.png" class="img-fluid">
+                    </div>
+                    
                 </div>
             </div>
         </div>
         <a href='#' id="submitBtn" class="close-menu m-4 btn btn-border btn-m btn-full mb-3 rounded-xl text-uppercase font-900 border-blue-dark color-blue-dark bg-theme">Submit</a>
+    </div>
+
+    <div id="detail"
+    class="menu menu-box-right rounded-0" 
+    data-menu-height="cover"
+    data-menu-width="cover"
+    >
+        <div class="card rounded-0" data-card-height="300">
+            <div class="card-top pt-4 ps-3 pe-3">
+                <a href="#" class="close-menu icon icon-s rounded-l bg-theme "><i class="fa fa-times color-red-dark"></i></a>
+                <a href="#" class="float-end icon icon-s rounded-l bg-theme color-theme ms-3"><i class="fa fa-home"></i></a>
+                <a href="#" class="float-end icon icon-s rounded-l bg-theme color-theme ms-3 show-on-theme-light" data-toggle-theme><i class="fa fa-moon"></i></a>
+                <a href="#" class="float-end icon icon-s rounded-l bg-theme color-theme ms-3 show-on-theme-dark" data-toggle-theme><i class="fa fa-sun"></i></a>
+            </div>
+            <div class="card-bottom ps-3 pe-3 mb-5 pb-4">
+                <h1 id="postTitle" class="color-white font-36"></h1>
+                <p class="color-white opacity-50">
+                    introduce
+                </p>
+            </div>
+            <div class="card-overlay bg-gradient"></div>
+        </div>
+    
+        <div class="card card-style card-full-right" style="margin-top:-100px; z-index:1">
+            <div class="content">
+                <h1 id='decision'></h1>     
+                <div class="row text-center row-cols-3 mb-0">
+                    <a class="col mb-4" data-gallery="gallery-1" href="images/pictures/27t.jpg" title="Vynil and Typerwritter"><img src="" data-src="" class="postImg preload-img img-fluid rounded-xs" alt="img"></a>
+                    <a class="col mb-4" data-gallery="gallery-1" href="images/pictures/22t.jpg" title="Cream Cookie"><img src="images/empty.png" data-src="images/pictures/18s.jpg" class="postImg preload-img img-fluid rounded-xs" alt="img"></a>
+                    <a class="col mb-4" data-gallery="gallery-1" href="images/pictures/23t.jpg" title="Cookies and Flowers"><img src="images/empty.png" data-src="images/pictures/16s.jpg" class="postImg preload-img img-fluid rounded-xs" alt="img"></a>
+                </div>
+
+                <p id="context" class="pb-4">Donec consectetur dictum nisi, et sodales lectus rutrum at. Donec lacinia metus quis metus rutrum, sed aliquet neque faucibus.Donec consectetur dictum nisi, et sodales lectus rutrum at. Donec lacinia metus quis metus rutrum, sed aliquet neque faucibus.Donec consectetur dictum nisi, et sodales lectus rutrum at. Donec lacinia metus quis metus rutrum, sed aliquet neque faucibus.Donec consectetur dictum nisi, et sodales lectus rutrum at. Donec lacinia metus quis metus rutrum, sed aliquet neque faucibus.</p>
+            </div>
+        </div>
+        <a href="#" class="close-menu btn btn-l rounded-sm font-600 btn-full btn-margins gradient-red">Close</a>
 
     </div>
-    
     <!-- Main Menu--> 
     <div id="menu-main" class="menu menu-box-left rounded-0" data-menu-load="menu-main.html" data-menu-width="280" data-menu-active="nav-components"></div>
     

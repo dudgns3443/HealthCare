@@ -5,7 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = 'http://3.34.133.128:8100/'
+    var url = 'http://localhost:8100/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -40,10 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        var userProfile = 'logo.png'
         var userId = getCookie('userId')
-        var albumBucketName = "heathcare";
+        var albumBucketName = "healthcare-caseup";
         var bucketRegion = "ap-northeast-2";
-        var IdentityPoolId = 'ap-northeast-2:206bddfc-ae76-4a39-8ff7-0cb2ed79252f';
+        var IdentityPoolId = 'ap-northeast-2:4d88ff51-32e8-4825-9b7a-6bc3679ce257';
 
         AWS.config.update({
             region: bucketRegion,
@@ -56,6 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
             apiVersion: "2006-03-01",
             params: { Bucket: albumBucketName }
         });
+        function uploadDate(){
+            var today = new Date();
+
+            var year = today.getFullYear();
+            var month = ('0' + (today.getMonth() + 1)).slice(-2);
+            var day = ('0' + today.getDate()).slice(-2);
+
+            var dateString = year + '-' + month  + '-' + day;
+
+            var hours = ('0' + today.getHours()).slice(-2); 
+            var minutes = ('0' + today.getMinutes()).slice(-2);
+            var seconds = ('0' + today.getSeconds()).slice(-2); 
+
+            var timeString = hours + ':' + minutes  + ':' + seconds;
+
+            return dateString+'_'+timeString
+        }
         function createAlbum(albumName) {
             albumName = albumName.trim();
             if (!albumName) {
@@ -81,15 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         function addPhoto(albumName) {
-            var files = document.querySelector('#file-upload').files;
+            var fileList = document.getElementsByName('file-upload');
+
             if (!files.length) {
               return alert("Please choose a file to upload first.");
             }
             var file = files[0];
-            var fileName = file.name;
             var albumPhotosKey = encodeURIComponent(albumName) + "/";
-          
-            var photoKey = albumPhotosKey + fileName;
+            var date = uploadDate()
+            var photoKey = albumPhotosKey + date;
           
             // Use S3 ManagedUpload class as it supports multipart uploads
             var upload = new AWS.S3.ManagedUpload({
@@ -109,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return alert("There was an error uploading your photo: ", err.message);
               }
             );
-            return 'https://heathcare.s3.ap-northeast-2.amazonaws.com/'+albumName+'/'+fileName
+            return 'https://healthcare-caseup.s3.ap-northeast-2.amazonaws.com/'+albumName+'/'+date
         }
         //Caching Global Variables
         var i, e, el; //https://www.w3schools.com/js/js_performance.asp
@@ -131,17 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 var pw = document.querySelector('#form1ad')
                 var confirmPw = document.querySelector('#form1ae')
                 var check = false
+                var profileUrl
                 if (pw.value != confirmPw.value){
                     alert('같은 비밀번호를 입력하세요.') 
                 }else if(signId.value == '' || userEmail.value == '' || pw.value == '' || confirmPw.value ==''){
                     alert('입력하지 않은 항목이 있습니다.');
                 } else{
-                    console.log(signId.value, pw.value)
                     $.ajax({
                         type:'GET',
                         url: url+'signUp',
                         async : false,
                         data: {
+                            userProfile : null,
                             userId : signId.value,
                             email : userEmail.value,
                             password : pw.value
@@ -155,10 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 
                             }
                         },
-                        error: (log) =>{alert('오류 발생')}
+                        error: (log) =>{
+                            alert('오류 발생')
+                            check
+                        }
                     })
-                    // if(check)
-                    //     location.href='home.html'
                 }
             })
         }
@@ -182,8 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             password : document.getElementById("loginPw").value
                         },
                         success: (res)=>{
-                            if(res){
-                                setCookie('userId',document.getElementById("loginId").value,1)
+                            if(res.length >0){
+                                setCookie('userId',res[0].userId,1)
+                                setCookie('userProfile',res[0].userProfile,1)
                                 location.href='home.html';
                             }
                             else 
@@ -203,23 +224,29 @@ document.addEventListener('DOMContentLoaded', () => {
             var decision = document.querySelector('#form5')
             var date = document.querySelector('#form6')
             var context = document.querySelector('#form7')
+
+            // var stat = document.querySelector('')
             var imgUrl
             submitBtn.addEventListener("click", e =>{
                 
                 if(title.value == '' || decision.value == 'default' || date.value == '' || context.value == ''){
-                    e.preventDefault();   
+                    e.preventDefault(); 
+                    var fileList = document.getElementsByName('file-upload');
+                    console.log(fileList[0].files)  
                 } else{
-                    imgUrl = addPhoto(userId);
+                    imgUrl = addPhoto(userId)
                     $.ajax({
                         type:'GET',
                         url: url+'data',
                         data: {
+                            status : $(":input:radio[name=inlineRadioOptions]:checked").val(),
                             userId : userId,
                             title : title.value,
                             decision: decision.value,
                             date : date.value,
                             context : context.value,
-                            imgUrl : imgUrl
+                            imgUrl : imgUrl,
+                            profile : userProfile
                         },
                         success: (res)=>{
                             title.value = null
@@ -235,33 +262,49 @@ document.addEventListener('DOMContentLoaded', () => {
         //HOME
         var home = document.querySelector('#home')
         if(home){
- 
+            var detailTitle = document.querySelector('#postTitle')
+            var detailImg = document.querySelector('.postImg')
+            var detailDecision = document.querySelector('#decision')
+            var detailContext = document.querySelector('#context')
             $.ajax({
                 type:'GET',
                 url: url+'getPosts',
                 success: (res)=>{
+                    var count =0 
                     res.reverse().forEach(ele =>{
-                        home.innerHTML += '<div class="card card-style post" data-card-height="450" style="background-image: url('+ ele.imgUrl +');">'
-                        + '<div class="card-bottom">'
-                        + '   <div class="content text-end">'
-                        + '      <h1 class="color-white font-28">'+ ele.title +'</h1>'
-                        +        '<p class="color-white opacity-70">'
-                        +        ele.decision 
-                        +       ' </p>'
-                        +    '</div>'
+                        home.innerHTML += '<div class="post" data-menu="detail">'
+                        // + '<img src="'+ele.profile+'" width="50" height="50" >'
+                        + '<div class="text-end">'
+                        + '<h4 class="a'+count+'"><img class="a'+count+'" src="'+ele.profile+'" width="50" height="50" > '+ele.userId+'</h4></div>'
+                        + '<img src="'+ele.imgUrl+'"  class="a'+count+' rounded-m preload-img shadow-xl img-fluid" alt="img">'
+                        + '      <div class="caption">'
+                        +        '<h4 class="bottom-0 color-theme a'+count+'">'+ele.title+'</h4>'
+                        +       '<p class="a'+count+'">'+ ele.decision 
+                        +       ' </p><br>'
+                        +    '<p class="a'+count+'">'+ ele.context+'</p>'
+                        +'<div class="divider bottom-0"></div>'
                         +'</div>'
-                        +'<div class="card-overlay bg-gradient opacity-80"></div>'
-                        +'<div class="divider divider-margins"></div>'
                         +' </div>'
+                        count++
+                    })
+                    
+                    document.querySelectorAll('.post').forEach((ele,idx)=> {
+                        ele.addEventListener('click',e=>{
+                            var targets =document.querySelectorAll('.a'+idx)
+                            detailTitle.innerText = targets[0].innerText
+                            detailImg.src = targets[2].src
+                            // console.log(targets[2].src, targets[3].innerText)
+                            detailDecision.innerText = targets[3].innerText
+                            detailContext.innerText = targets[5].innerText
+
+
+                        })
+                        
                     })
                 },
                 error: (log) =>{console.log('error')}
             })
-            document.querySelectorAll('.post').forEach(ele => {
-                ele.addEventListener('click',e =>{
-
-                })
-            })    
+            
         }
         
         //Activating Menus
@@ -752,24 +795,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         //File Upload
-        const inputArray = document.getElementsByClassName('upload-file');
+        const inputArray = document.getElementsByName('file-upload');
         if(inputArray.length){
-            inputArray[0].addEventListener('change',prepareUpload,false);
-                function prepareUpload(event){
-                  if (this.files && this.files[0]) {
-                  var img = document.getElementById('image-data');
-                  img.src = URL.createObjectURL(this.files[0]);
-                  console.log(URL.createObjectURL(this.files[0]))
-              }
+            function prepareUpload(event){
+                if (this.files && this.files[0]) {
+                    var img = document.createElement('img')
+                    img.classList = 
+                    img.src = URL.createObjectURL(this.files[0]);
+
+                }
                 const files = event.target.files;
                 const fileName = files[0].name;
-                document.getElementsByClassName('file-data')[0].classList.add('disabled');
+            // document.getElementsByClassName('file-data')[0].classList.add('disabled');
                 document.getElementsByClassName('upload-file-data')[0].classList.remove('disabled');
-                document.getElementsByClassName('upload-file-name')[0].innerHTML = files[0].name;
-                document.getElementsByClassName('upload-file-modified')[0].innerHTML = files[0].lastModifiedDate;
-                document.getElementsByClassName('upload-file-size')[0].innerHTML = files[0].size/1000+'kb';
-                document.getElementsByClassName('upload-file-type')[0].innerHTML = files[0].type;
+              
             }
+            inputArray.forEach(ele => {
+                ele.addEventListener('change',prepareUpload,false);
+            })
+            
 
         }
         var locationBut = document.querySelectorAll('.get-location');
