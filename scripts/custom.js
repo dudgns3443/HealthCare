@@ -183,40 +183,40 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
         //login
-        var LoginBtn = document.querySelector('#loginBtn')
-        if(LoginBtn){
-            LoginBtn.addEventListener("click", e => {
-                e.preventDefault();
-                if (document.getElementById("loginId").value == ''){
-                    alert('아이디를 입력해주세요');
-                }else if(document.getElementById("loginPw").value == ''){
-                    alert('비밀번호를 입력해주세요');
-                } else{
+//         var LoginBtn = document.querySelector('#loginBtn')
+//         if(LoginBtn){
+//             LoginBtn.addEventListener("click", e => {
+//                 e.preventDefault();
+//                 if (document.getElementById("loginId").value == ''){
+//                     alert('아이디를 입력해주세요');
+//                 }else if(document.getElementById("loginPw").value == ''){
+//                     alert('비밀번호를 입력해주세요');
+//                 } else{
                 
-                    $.ajax({
-                        type:'GET',
-                        async : false,
-                        url: url+'signIn',
-                        data: {
-                            userId : document.getElementById("loginId").value,
-                            password : document.getElementById("loginPw").value
-                        },
-                        success: (res)=>{
-                            if(res.length >0){
-                                setCookie('userId',res[0].userId,1)
-                                setCookie('userProfile',res[0].userProfile,1)
-                                location.href='home.html';
-                            }
-                            else 
-                                alert('아이디 또는 패스워드가 일치하지 않습니다.')
-                        },
-                        error: (log) =>{alert('로그인 실패')}
-                    })
+//                     $.ajax({
+//                         type:'GET',
+//                         async : false,
+//                         url: url+'signIn',
+//                         data: {
+//                             userId : document.getElementById("loginId").value,
+//                             password : document.getElementById("loginPw").value
+//                         },
+//                         success: (res)=>{
+//                             if(res.length >0){
+//                                 setCookie('userId',res[0].userId,1)
+//                                 setCookie('userProfile',res[0].userProfile,1)
+//                                 location.href='home.html';
+//                             }
+//                             else 
+//                                 alert('아이디 또는 패스워드가 일치하지 않습니다.')
+//                         },
+//                         error: (log) =>{alert('로그인 실패')}
+//                     })
 
-                }
+//                 }
 
-            })
-        }
+//             })
+//         }
         //UPLOAD
         var submitBtn = document.querySelector('#submitBtn')
         if(submitBtn){
