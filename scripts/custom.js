@@ -5,7 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = '/nlb/'
+    var url = 'http://a4-nlb-159008c51cde6d9f.elb.ap-northeast-2.amazonaws.com:8100'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
