@@ -5,7 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = '/nlb/'
+    var url = 'nlb/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //menu('menu-settings', 'show', 250);
 
         //signup
-        console.log(window.location.hostname+'/nlb/')
+ 
         var signupBtn = document.querySelector('#signupBtn')
         if(signupBtn){
             // console.log(window.location.href)
