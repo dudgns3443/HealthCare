@@ -5,7 +5,7 @@ setTimeout(function(){
 },150);
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
-    var url = 'nlb/'
+    var url = 'localhost:8100/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var pwaScope = "/";
     var pwaLocation = "/_service-worker.js";
 
-    //Place all your custom Javascript functions and plugin calls below this line
+    //Place your custom Javascript functions and plugin calls below this line
     function init_template(){
         function setCookie(c_name,value,exdays)
         {
@@ -187,6 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
         //login
         var LoginBtn = document.querySelector('#loginBtn')
         if(LoginBtn){
+            $.ajax({
+                type:'GET',
+                async : false,
+                url: url+'session',
+                success: (res)=>{
+                    console.log(res.msg)
+                    if(res.bool){
+                        location.href='home.html'
+                    }
+                },
+                error: (log) =>{alert('erro accured')}
+            })
             LoginBtn.addEventListener("click", e => {
                 e.preventDefault();
                 if (document.getElementById("loginId").value == ''){
