@@ -186,21 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
         //session
-        // var session = document.querySelector('#session')
-        // if (session){
-        //     $.ajax({
-        //         type:'GET',
-        //         async : false,
-        //         url: url+'session',
-        //         success: (res)=>{
-        //             console.log(res.msg)
-        //             if(res.bool){
-        //                 location.href='home.html'
-        //             }
-        //         },
-        //         error: (log) =>{alert('erro accured')}
-        //     })
-        // }
+        var session = document.querySelector('#session')
+        if (session){
+            $.ajax({
+                type:'GET',
+                async : false,
+                url: url+'session',
+                success: (res)=>{
+                    console.log(res.msg)
+                    // if(res.bool){
+                    //     location.href='home.html'
+                    // }
+                },
+                error: (log) =>{alert('error accured')}
+            })
+        }
         //login
         var LoginBtn = document.querySelector('#loginBtn')
         if(LoginBtn){
