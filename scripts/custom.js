@@ -6,7 +6,7 @@ setTimeout(function(){
 document.addEventListener('DOMContentLoaded', () => {
     'use strict'
     // var url = 'http://localhost:8100/'
-    url = 'nlb/'
+    var url = 'nlb/'
     //Global Variables
     let isPWA = true;  // Enables or disables the service worker and PWA
     let isAJAX = true; // AJAX transitions. Requires local server or server
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else{
                     $.ajax({
                         type:'GET',
-                        url: url+'signUp',
+                        url: url+'signUp', // http://alb_dns/nlb/signUp
                         async : false,
                         data: {
                             userProfile : null,
@@ -185,21 +185,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
         }
+        //session
+        // var session = document.querySelector('#session')
+        // if (session){
+        //     $.ajax({
+        //         type:'GET',
+        //         async : false,
+        //         url: url+'session',
+        //         success: (res)=>{
+        //             console.log(res.msg)
+        //             if(res.bool){
+        //                 location.href='home.html'
+        //             }
+        //         },
+        //         error: (log) =>{alert('erro accured')}
+        //     })
+        // }
         //login
         var LoginBtn = document.querySelector('#loginBtn')
         if(LoginBtn){
-            // $.ajax({
-            //     type:'GET',
-            //     async : false,
-            //     url: url+'session',
-            //     success: (res)=>{
-            //         console.log(res.msg)
-            //         if(res.bool){
-            //             location.href='home.html'
-            //         }
-            //     },
-            //     error: (log) =>{alert('erro accured')}
-            // })
             LoginBtn.addEventListener("click", e => {
                 e.preventDefault();
                 if (document.getElementById("loginId").value == ''){
