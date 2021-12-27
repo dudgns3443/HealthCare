@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             $.ajax({
                 type:'GET',
                 async : false,
-                url: 'http://localhost:8100/session',
+                url: url+'session',
                 success: (res)=>{
                     console.log(res.msg)
                     // if(res.bool){
